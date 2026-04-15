@@ -9,6 +9,7 @@ interface AuthContextType {
   profile: Profile | null;
   roles: AppRole[];
   isLoading: boolean;
+  isPlatformAdmin: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>;
@@ -25,6 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPlatformAdmin, setIsPlatformAdmin] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -73,7 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (rolesResult.data) {
-        setRoles(rolesResult.data.map((r) => r.role as AppRole));
+        const userRoles = rolesResult.data.map((r) => r.role as AppRole);
+        setRoles(userRoles);
+        setIsPlatformAdmin(userRoles.includes('platform_admin'));
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -111,10 +115,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setProfile(null);
     setRoles([]);
+    setIsPlatformAdmin(false);
   };
 
-  const hasRole = (role: AppRole) => roles.includes(role);
-  const isAdmin = hasRole('super_admin') || hasRole('event_manager');
+  const hasRole = (role: AppRole) => roles.includes(role) || isPlatformAdmin;
+  const isAdmin = hasRole('super_admin') || hasRole('event_manager') || isPlatformAdmin;
 
   return (
     <AuthContext.Provider
@@ -124,6 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         roles,
         isLoading,
+        isPlatformAdmin,
         signUp,
         signIn,
         signInWithMagicLink,

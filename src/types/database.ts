@@ -1,6 +1,6 @@
 // Database types for the Event Management Platform
 
-export type AppRole = 'super_admin' | 'event_manager' | 'staff' | 'attendee' | 'sales_rep';
+export type AppRole = 'super_admin' | 'event_manager' | 'staff' | 'attendee' | 'sales_rep' | 'platform_admin';
 export type EventStatus = 'draft' | 'published' | 'cancelled' | 'completed';
 export type RegistrationStatus = 'pending' | 'confirmed' | 'waitlisted' | 'cancelled' | 'checked_in';
 

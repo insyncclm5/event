@@ -39,6 +39,9 @@ import LandingPageAdmin from "./pages/admin/LandingPage";
 import Registrations from "./pages/admin/Registrations";
 import Settings from "./pages/admin/Settings";
 import AdminMeetingSpots from "./pages/admin/MeetingSpots";
+// Platform Pages
+import PlatformDashboard from "./pages/platform/Dashboard";
+
 // SDR Pages
 import SDRDashboard from "./pages/sdr/Dashboard";
 import SDRInvite from "./pages/sdr/Invite";
@@ -92,6 +95,9 @@ const App = () => (
             <Route path="/admin/registrations" element={<ProtectedRoute allowedRoles={[...adminRoles]}><Registrations /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={[...adminRoles]}><Settings /></ProtectedRoute>} />
             
+            {/* Platform Admin Route */}
+            <Route path="/platform" element={<PlatformDashboard />} />
+
             {/* SDR Routes - protected */}
             <Route path="/sdr" element={<ProtectedRoute allowedRoles={[...sdrRoles]}><SDRDashboard /></ProtectedRoute>} />
             <Route path="/sdr/dashboard" element={<ProtectedRoute allowedRoles={[...sdrRoles]}><SDRDashboard /></ProtectedRoute>} />

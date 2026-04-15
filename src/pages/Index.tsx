@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Calendar, Users, QrCode, Award, ArrowRight, CheckCircle, Smartphone } from 'lucide-react';
+import { Calendar, Users, QrCode, Award, ArrowRight, CheckCircle, Smartphone, IndianRupee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MainLayout } from '@/components/layout/MainLayout';
 
@@ -133,6 +133,57 @@ export default function Index() {
                   <div className="mt-6 h-10 bg-primary rounded-lg" />
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-16 md:py-24 bg-muted/50">
+        <div className="container-mobile">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+              <IndianRupee className="h-3.5 w-3.5" />
+              Pricing
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold">Simple, Transparent Pricing</h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              One plan. Everything included. No surprises.
+            </p>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="relative w-full max-w-lg rounded-3xl border-2 border-primary bg-gradient-to-br from-primary/10 via-card to-primary/5 p-10 text-center shadow-2xl shadow-primary/15 backdrop-blur-sm">
+              <IndianRupee className="mx-auto h-10 w-10 text-primary/80" />
+              <div className="mt-4 flex items-end justify-center gap-1">
+                <span className="text-5xl font-extrabold tracking-tight text-foreground">₹199</span>
+                <span className="mb-2 text-muted-foreground">/member/month</span>
+              </div>
+              <p className="mt-3 text-muted-foreground">
+                Everything you need to run professional events at scale
+              </p>
+              <ul className="mt-6 space-y-3 text-sm text-left max-w-xs mx-auto">
+                {[
+                  'Unlimited events',
+                  'Custom registration forms',
+                  'QR code check-in',
+                  'Certificates & badges',
+                  'Real-time analytics',
+                  'Email notifications',
+                  'Multi-organizer support',
+                ].map((feature) => (
+                  <li key={feature} className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button size="lg" className="mt-8 w-full text-lg shadow-lg shadow-primary/25" asChild>
+                <Link to="/register">
+                  Get Started
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
