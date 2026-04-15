@@ -1,8 +1,8 @@
-const CACHE_NAME = 'eventq-v1';
+const CACHE_NAME = 'event-sync-v1';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/favicon.ico',
+  '/favicon.png',
 ];
 
 // Install event - cache static assets

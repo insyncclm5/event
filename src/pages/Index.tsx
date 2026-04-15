@@ -109,7 +109,7 @@ export default function Index() {
                 Built for the Mobile Era
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                EventQ is designed from the ground up for mobile devices. 
+                Event-Sync is designed from the ground up for mobile devices. 
                 Install it as an app, work offline, and manage your events from anywhere.
               </p>
               <ul className="space-y-4">
@@ -145,7 +145,7 @@ export default function Index() {
             Ready to Get Started?
           </h2>
           <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Join thousands of event organizers who trust EventQ to manage their events.
+            Join thousands of event organizers who trust Event-Sync to manage their events.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button

@@ -1,6 +1,6 @@
 {
-  "name": "EventQ - Event Management Platform",
-  "short_name": "EventQ",
+  "name": "Event-Sync - Event Management Platform",
+  "short_name": "Event-Sync",
   "description": "Professional event management platform with registration, check-in, and engagement features",
   "start_url": "/",
   "display": "standalone",
