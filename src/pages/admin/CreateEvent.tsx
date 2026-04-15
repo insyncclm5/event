@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Video } from 'lucide-react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,8 @@ const eventSchema = z.object({
   end_date: z.string().min(1, 'End date is required'),
   registration_deadline: z.string().optional(),
   max_capacity: z.coerce.number().min(0).max(100000).optional(),
+  mode: z.enum(['in_person', 'virtual', 'hybrid']),
+  virtual_join_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   status: z.enum(['draft', 'published']),
 });
 
@@ -47,10 +49,12 @@ export default function CreateEvent() {
     resolver: zodResolver(eventSchema),
     defaultValues: {
       status: 'draft',
+      mode: 'in_person',
     },
   });
 
   const title = watch('title');
+  const mode = watch('mode');
 
   // Auto-generate slug from title
   const generateSlug = (title: string) => {
@@ -72,10 +76,12 @@ export default function CreateEvent() {
         address: data.address,
         city: data.city,
         status: data.status,
+        mode: data.mode,
+        virtual_join_url: data.virtual_join_url || undefined,
         start_date: new Date(data.start_date).toISOString(),
         end_date: new Date(data.end_date).toISOString(),
-        registration_deadline: data.registration_deadline 
-          ? new Date(data.registration_deadline).toISOString() 
+        registration_deadline: data.registration_deadline
+          ? new Date(data.registration_deadline).toISOString()
           : undefined,
         max_capacity: data.max_capacity || undefined,
         created_by: user?.id,
@@ -250,6 +256,50 @@ export default function CreateEvent() {
                   {...register('city')}
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Event Format */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Video className="h-5 w-5" /> Event Format</CardTitle>
+              <CardDescription>Is this event in-person, virtual, or hybrid?</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="mode">Format</Label>
+                <Select
+                  defaultValue="in_person"
+                  onValueChange={(v) => setValue('mode', v as 'in_person' | 'virtual' | 'hybrid')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="in_person">In-Person</SelectItem>
+                    <SelectItem value="virtual">Virtual</SelectItem>
+                    <SelectItem value="hybrid">Hybrid (In-Person + Online)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {(mode === 'virtual' || mode === 'hybrid') && (
+                <div className="space-y-2">
+                  <Label htmlFor="virtual_join_url">Stream / Join URL</Label>
+                  <Input
+                    id="virtual_join_url"
+                    placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                    {...register('virtual_join_url')}
+                    className={errors.virtual_join_url ? 'border-destructive' : ''}
+                  />
+                  {errors.virtual_join_url && (
+                    <p className="text-sm text-destructive">{errors.virtual_join_url.message}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Leave blank to auto-generate a free Jitsi room for each session.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 

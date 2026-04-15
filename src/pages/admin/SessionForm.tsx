@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, Loader2, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,6 +41,7 @@ const sessionSchema = z.object({
   start_time: z.string().min(1, 'Start time is required'),
   end_time: z.string().min(1, 'End time is required'),
   location: z.string().optional(),
+  virtual_join_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   track: z.string().optional(),
   max_capacity: z.number().optional(),
   speaker_ids: z.array(z.string()).optional(),
@@ -50,13 +51,14 @@ type SessionFormData = z.infer<typeof sessionSchema>;
 
 interface SessionFormProps {
   eventId: string;
+  eventMode?: 'in_person' | 'virtual' | 'hybrid';
   session?: SessionWithSpeakers | null;
   speakers: Speaker[];
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-export function SessionForm({ eventId, session, speakers, onSuccess, onCancel }: SessionFormProps) {
+export function SessionForm({ eventId, eventMode = 'in_person', session, speakers, onSuccess, onCancel }: SessionFormProps) {
   const createSession = useCreateSession();
   const updateSession = useUpdateSession();
   const { toast } = useToast();
@@ -79,6 +81,7 @@ export function SessionForm({ eventId, session, speakers, onSuccess, onCancel }:
       start_time: defaultStartTime,
       end_time: defaultEndTime,
       location: session?.location || '',
+      virtual_join_url: session?.virtual_join_url || '',
       track: session?.track || '',
       max_capacity: session?.max_capacity || undefined,
       speaker_ids: session?.speakers?.map(s => s.id) || [],
@@ -103,6 +106,7 @@ export function SessionForm({ eventId, session, speakers, onSuccess, onCancel }:
         start_time: startDateTime.toISOString(),
         end_time: endDateTime.toISOString(),
         location: data.location || null,
+        virtual_join_url: data.virtual_join_url || null,
         track: data.track || null,
         max_capacity: data.max_capacity || null,
         event_id: eventId,
@@ -284,6 +288,22 @@ export function SessionForm({ eventId, session, speakers, onSuccess, onCancel }:
             )}
           />
         </div>
+
+        {(eventMode === 'virtual' || eventMode === 'hybrid') && (
+          <FormField
+            control={form.control}
+            name="virtual_join_url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1.5"><Video className="h-4 w-4" /> Session Join URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="https://zoom.us/j/... — leave blank to auto-generate Jitsi room" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}

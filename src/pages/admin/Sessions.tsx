@@ -282,6 +282,7 @@ export default function AdminSessions() {
           </DialogHeader>
           <SessionForm
             eventId={eventId!}
+            eventMode={(event as any)?.mode ?? 'in_person'}
             session={editingSession}
             speakers={speakers || []}
             onSuccess={closeForm}

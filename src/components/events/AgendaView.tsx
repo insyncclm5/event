@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { Clock, MapPin, User, Plus, Check, Loader2 } from 'lucide-react';
+import { Clock, MapPin, User, Plus, Check, Loader2, Video, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,20 +14,60 @@ import {
 } from '@/components/ui/select';
 import { useAddToSchedule, useRemoveFromSchedule, useAttendeeSchedule } from '@/hooks/useAttendeeSchedule';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import type { SessionWithSpeakers } from '@/types/database';
 
 interface AgendaViewProps {
   sessions: SessionWithSpeakers[];
   registrationId?: string;
+  eventId?: string;
+  eventMode?: 'in_person' | 'virtual' | 'hybrid';
+  eventSlug?: string;
   isLoading?: boolean;
 }
 
-export function AgendaView({ sessions, registrationId, isLoading }: AgendaViewProps) {
+function jitsiUrl(eventSlug: string, sessionId: string) {
+  return `https://meet.jit.si/eventsync-${eventSlug}-${sessionId.slice(0, 8)}`;
+}
+
+function resolveJoinUrl(session: SessionWithSpeakers, eventSlug?: string): string | null {
+  if (session.virtual_join_url) return session.virtual_join_url;
+  if (eventSlug) return jitsiUrl(eventSlug, session.id);
+  return null;
+}
+
+export function AgendaView({ sessions, registrationId, eventId, eventMode = 'in_person', eventSlug, isLoading }: AgendaViewProps) {
   const [trackFilter, setTrackFilter] = useState<string>('all');
   const { data: schedule } = useAttendeeSchedule(registrationId);
   const addToSchedule = useAddToSchedule();
   const removeFromSchedule = useRemoveFromSchedule();
   const { toast } = useToast();
+  const isVirtual = eventMode === 'virtual' || eventMode === 'hybrid';
+
+  const handleJoinSession = async (session: SessionWithSpeakers) => {
+    const joinUrl = resolveJoinUrl(session, eventSlug);
+    if (!joinUrl) return;
+
+    // Virtual check-in: log it in check_ins (best-effort, don't block join)
+    if (registrationId && eventId) {
+      supabase.from('check_ins').insert({
+        registration_id: registrationId,
+        session_id: session.id,
+        event_id: eventId,
+        method: 'virtual',
+        check_in_time: new Date().toISOString(),
+      }).then(() => {
+        supabase
+          .from('registrations')
+          .update({ status: 'checked_in', checked_in_at: new Date().toISOString() })
+          .eq('id', registrationId)
+          .eq('status', 'confirmed')
+          .then(() => {});
+      });
+    }
+
+    window.open(joinUrl, '_blank', 'noopener,noreferrer');
+  };
 
   const isInSchedule = (sessionId: string) => {
     return schedule?.some((item: any) => item.session_id === sessionId) || false;
@@ -186,6 +226,12 @@ export function AgendaView({ sessions, registrationId, isLoading }: AgendaViewPr
                                         {session.location}
                                       </div>
                                     )}
+                                    {isVirtual && (
+                                      <Badge variant="secondary" className="text-xs gap-1">
+                                        <Video className="h-3 w-3" />
+                                        {session.virtual_join_url ? 'Custom room' : 'Jitsi room'}
+                                      </Badge>
+                                    )}
                                   </div>
                                   {session.speakers && session.speakers.length > 0 && (
                                     <div className="flex items-center gap-2 mt-3">
@@ -198,26 +244,39 @@ export function AgendaView({ sessions, registrationId, isLoading }: AgendaViewPr
                                 </div>
                               </div>
                             </div>
-                            {registrationId && (
-                              <Button
-                                variant={inSchedule ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => handleToggleSchedule(session.id)}
-                                disabled={addToSchedule.isPending || removeFromSchedule.isPending}
-                              >
-                                {inSchedule ? (
-                                  <>
-                                    <Check className="h-4 w-4 mr-2" />
-                                    In My Schedule
-                                  </>
-                                ) : (
-                                  <>
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add to Schedule
-                                  </>
-                                )}
-                              </Button>
-                            )}
+                            <div className="flex flex-col gap-2 shrink-0">
+                              {isVirtual && (
+                                <Button
+                                  size="sm"
+                                  className="bg-violet-600 hover:bg-violet-700 text-white"
+                                  onClick={() => handleJoinSession(session)}
+                                >
+                                  <Video className="h-4 w-4 mr-2" />
+                                  Join Session
+                                  <ExternalLink className="h-3 w-3 ml-1.5 opacity-70" />
+                                </Button>
+                              )}
+                              {registrationId && (
+                                <Button
+                                  variant={inSchedule ? 'default' : 'outline'}
+                                  size="sm"
+                                  onClick={() => handleToggleSchedule(session.id)}
+                                  disabled={addToSchedule.isPending || removeFromSchedule.isPending}
+                                >
+                                  {inSchedule ? (
+                                    <>
+                                      <Check className="h-4 w-4 mr-2" />
+                                      In My Schedule
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Plus className="h-4 w-4 mr-2" />
+                                      Add to Schedule
+                                    </>
+                                  )}
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </CardContent>
                       </Card>

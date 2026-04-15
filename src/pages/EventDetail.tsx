@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, MapPin, Clock, Users, Share2, ArrowLeft, Loader2, UserPlus, CalendarDays } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Share2, ArrowLeft, Loader2, UserPlus, CalendarDays, Video, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -236,7 +236,32 @@ export default function EventDetail() {
                   </span>
                 </div>
               )}
+              {(event as any).mode && (event as any).mode !== 'in_person' && (
+                <div className="flex items-center gap-2 text-violet-600">
+                  <Video className="h-5 w-5" />
+                  <span className="font-medium capitalize">{(event as any).mode === 'hybrid' ? 'Hybrid Event' : 'Virtual Event'}</span>
+                </div>
+              )}
             </div>
+
+            {/* Virtual join banner for registered attendees */}
+            {(event as any).virtual_join_url && registration && (
+              <a
+                href={(event as any).virtual_join_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-violet-50 border border-violet-200 rounded-xl hover:bg-violet-100 transition-colors group"
+              >
+                <div className="h-10 w-10 rounded-full bg-violet-600 flex items-center justify-center shrink-0">
+                  <Video className="h-5 w-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-violet-900 text-sm">Join Online</p>
+                  <p className="text-violet-600 text-xs">Click to open the event stream / meeting room</p>
+                </div>
+                <ExternalLink className="h-4 w-4 text-violet-400 group-hover:text-violet-600 transition-colors" />
+              </a>
+            )}
 
             <Separator />
 
@@ -298,6 +323,9 @@ export default function EventDetail() {
                 <AgendaView
                   sessions={sessions}
                   registrationId={registration?.id}
+                  eventId={event.id}
+                  eventMode={(event as any).mode ?? 'in_person'}
+                  eventSlug={event.slug}
                   isLoading={sessionsLoading}
                 />
               </div>

@@ -63,6 +63,8 @@ const eventSchema = z.object({
   end_date: z.date({ required_error: 'End date is required' }),
   registration_deadline: z.date().optional(),
   max_capacity: z.number().optional(),
+  mode: z.enum(['in_person', 'virtual', 'hybrid']),
+  virtual_join_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   status: z.enum(['draft', 'published', 'cancelled', 'completed']),
 });
 
@@ -91,6 +93,8 @@ export default function EventEdit() {
       end_date: new Date(event.end_date),
       registration_deadline: event.registration_deadline ? new Date(event.registration_deadline) : undefined,
       max_capacity: event.max_capacity || undefined,
+      mode: ((event as any).mode as 'in_person' | 'virtual' | 'hybrid') || 'in_person',
+      virtual_join_url: (event as any).virtual_join_url || '',
       status: event.status as EventStatus,
     } : undefined,
   });
@@ -111,8 +115,10 @@ export default function EventEdit() {
         end_date: data.end_date.toISOString(),
         registration_deadline: data.registration_deadline?.toISOString() || null,
         max_capacity: data.max_capacity || null,
+        mode: data.mode,
+        virtual_join_url: data.virtual_join_url || null,
         status: data.status,
-      });
+      } as any);
 
       toast({ title: 'Event updated successfully' });
     } catch (error) {
@@ -463,6 +469,48 @@ export default function EventEdit() {
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={form.control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Event Format</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="in_person">In-Person</SelectItem>
+                                <SelectItem value="virtual">Virtual</SelectItem>
+                                <SelectItem value="hybrid">Hybrid (In-Person + Online)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {(form.watch('mode') === 'virtual' || form.watch('mode') === 'hybrid') && (
+                        <FormField
+                          control={form.control}
+                          name="virtual_join_url"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Stream / Join URL</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="https://zoom.us/j/... — leave blank for auto Jitsi rooms per session"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     </div>
 
                     <div className="flex justify-end pt-4">

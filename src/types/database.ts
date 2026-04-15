@@ -2,6 +2,7 @@
 
 export type AppRole = 'super_admin' | 'event_manager' | 'staff' | 'attendee' | 'sales_rep' | 'platform_admin';
 export type EventStatus = 'draft' | 'published' | 'cancelled' | 'completed';
+export type EventMode = 'in_person' | 'virtual' | 'hybrid';
 export type RegistrationStatus = 'pending' | 'confirmed' | 'waitlisted' | 'cancelled' | 'checked_in';
 
 export interface Profile {
@@ -37,6 +38,8 @@ export interface Event {
   max_capacity: number | null;
   banner_url: string | null;
   logo_url: string | null;
+  mode: EventMode;
+  virtual_join_url: string | null;
   status: EventStatus;
   settings: Record<string, unknown>;
   created_by: string | null;
@@ -81,6 +84,7 @@ export interface Session {
   location: string | null;
   track: string | null;
   max_capacity: number | null;
+  virtual_join_url: string | null;
   sort_order: number;
   created_at: string;
   updated_at: string;

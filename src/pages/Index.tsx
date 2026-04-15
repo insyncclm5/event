@@ -7,7 +7,7 @@ import {
   CheckCircle, IndianRupee, Star, Gift, Sparkles,
   ShieldCheck, Timer, Menu, X, ChevronDown, ChevronUp,
   Trophy, Target, Zap, Share2, Mail, Clock, Play,
-  Lock, FileSpreadsheet, TrendingUp,
+  Lock, FileSpreadsheet, TrendingUp, MessageCircle, Video,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logoWhite from '@/assets/logo-white.png';
@@ -45,7 +45,7 @@ const FEATURE_GROUPS = [
     features: [
       { icon: Calendar, title: 'Event Setup', description: 'Create events with agendas, speakers, sessions, and venue details in minutes.' },
       { icon: Users, title: 'Custom Registration', description: 'Build registration forms with any fields you need — t-shirt sizes, dietary needs, role, company.' },
-      { icon: Mail, title: 'Automated Invites', description: 'Attendees receive a confirmation email with their unique QR code immediately after registering.' },
+      { icon: MessageCircle, title: 'Automated Notifications', description: 'Attendees instantly receive a WhatsApp message and confirmation email with their QR code the moment they register.' },
     ],
   },
   {
@@ -54,6 +54,7 @@ const FEATURE_GROUPS = [
     lightColor: 'bg-violet-50 text-violet-700 border-violet-100',
     features: [
       { icon: QrCode, title: 'QR Check-In', description: 'Scan QR codes at the gate from any phone. No app install needed. Track attendance live.' },
+      { icon: Video, title: 'Virtual & Hybrid Events', description: 'Run fully virtual or hybrid events. Each session gets an auto-generated Jitsi room or link to your own platform. Virtual attendees are checked in automatically.' },
       { icon: Trophy, title: 'Gamification', description: 'Award points for check-ins, sessions, and activities. Run live leaderboards and badge competitions.' },
       { icon: Target, title: 'Networking Spots', description: '1:1 meeting slots and discussion topics. Attendees book, meet, and follow up — all in-platform.' },
     ],
@@ -63,7 +64,7 @@ const FEATURE_GROUPS = [
     color: 'bg-teal-600',
     lightColor: 'bg-teal-50 text-teal-700 border-teal-100',
     features: [
-      { icon: Award, title: 'Certificates', description: 'Bulk issue branded certificates to all checked-in attendees. Each cert has a public verify URL.' },
+      { icon: Award, title: 'Certificates', description: 'Bulk issue branded certificates to all checked-in — and virtual — attendees. Each cert has a public verify URL.' },
       { icon: BarChart3, title: 'Analytics', description: 'Full event report — registrations, attendance rate, session popularity, engagement score.' },
       { icon: Share2, title: 'Content & Export', description: 'Share recordings and slides post-event. Export all data to Excel with one click.' },
     ],
@@ -72,7 +73,7 @@ const FEATURE_GROUPS = [
 
 const HOW_IT_WORKS = [
   { step: 1, icon: Calendar, title: 'Create Your Event', description: 'Set up your event in minutes — add agenda, speakers, venue, and custom registration fields.' },
-  { step: 2, icon: Mail, title: 'Invite Attendees', description: 'Share your registration link. Attendees sign up and instantly receive their QR code.' },
+  { step: 2, icon: MessageCircle, title: 'Invite Attendees', description: 'Share your registration link. Attendees sign up and instantly receive their QR code via WhatsApp and email.' },
   { step: 3, icon: QrCode, title: 'Run Check-In', description: 'Scan QR codes at the gate. Track attendance live on your dashboard — no paper, no stress.' },
   { step: 4, icon: Award, title: 'Wrap Up & Reward', description: 'Issue certificates, export data, review analytics, and distribute content to attendees.' },
 ];
@@ -152,6 +153,10 @@ const FAQS = [
     q: 'Can multiple organizers manage the same event?',
     a: 'Yes. Add team members with different roles — event manager, staff, sales rep — each with appropriate access levels.',
   },
+  {
+    q: 'How do WhatsApp notifications work?',
+    a: 'Event-Sync sends automated WhatsApp messages directly to attendees\' phones — registration confirmation with QR code, 24-hour event reminder, check-in confirmation, certificate issued, and more. Messages are sent via approved Meta templates so they land in the primary chat, not spam.',
+  },
 ];
 
 const PRICING_FEATURES = [
@@ -159,6 +164,7 @@ const PRICING_FEATURES = [
   'Unlimited attendees',
   'Custom registration forms',
   'QR code check-in',
+  'Virtual & hybrid event support (Jitsi built-in)',
   'Certificates & badge templates',
   'Gamification & leaderboards',
   'Networking & meeting spots',
@@ -166,7 +172,8 @@ const PRICING_FEATURES = [
   'Content library & sharing',
   'Excel export',
   'Multi-organizer support',
-  'Email notifications',
+  'WhatsApp & email notifications (14 event types)',
+  'Prepaid wallet billing — no surprise invoices',
 ];
 
 const TRUSTED_BY = ['TechSummit India', 'StartupWeek', 'EduCon', 'MedConf', 'FinFest', 'HRLeaders'];
@@ -336,7 +343,7 @@ export default function Index() {
             custom={0} variants={fadeUp} initial="hidden" animate="visible"
             className="text-white/50 text-sm sm:text-base mb-5 font-medium"
           >
-            Spreadsheets. WhatsApp groups. Manual check-in queues. There's a better way.
+            Spreadsheets. Broadcast WhatsApp groups. Manual check-in queues. There's a better way.
           </motion.p>
 
           <motion.h1
@@ -353,7 +360,7 @@ export default function Index() {
             custom={2} variants={fadeUp} initial="hidden" animate="visible"
             className="mt-6 text-lg sm:text-xl text-white/65 max-w-2xl mx-auto text-balance leading-relaxed"
           >
-            Event-Sync handles registration, QR check-in, live leaderboards, certificates, and analytics — all without stitching together a dozen tools.
+            Event-Sync handles registration, QR check-in, WhatsApp & email notifications, live leaderboards, certificates, and analytics — all without stitching together a dozen tools.
           </motion.p>
 
           <motion.div

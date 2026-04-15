@@ -137,11 +137,11 @@ create policy "users_own_billing_transactions"
 -- Platform admins see everything
 create policy "platform_admin_billing_accounts"
   on public.billing_accounts for all
-  using (public.is_platform_admin());
+  using (public.is_platform_admin(auth.uid()));
 
 create policy "platform_admin_billing_transactions"
   on public.billing_transactions for all
-  using (public.is_platform_admin());
+  using (public.is_platform_admin(auth.uid()));
 
 -- ── Backfill existing users ───────────────────────────────────────────────────
 
