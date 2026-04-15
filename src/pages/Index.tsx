@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useInView, useScroll, useMotionValueEvent } from 'framer-motion';
 import {
-  Calendar, Users, QrCode, Award, BarChart3, Bell,
+  Calendar, Users, QrCode, Award, BarChart3,
   Smartphone, Download, UserCheck, Shield, ArrowRight,
   CheckCircle, IndianRupee, Star, Gift, Sparkles,
   ShieldCheck, Timer, Menu, X, ChevronDown, ChevronUp,
-  Trophy, Target, Zap, Share2, Mail, Clock
+  Trophy, Target, Zap, Share2, Mail, Clock, Play,
+  Lock, FileSpreadsheet, TrendingUp,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logoWhite from '@/assets/logo-white.png';
@@ -36,17 +37,37 @@ const STATS = [
   { value: 4, suffix: '.9/5', label: 'Organizer Rating' },
 ];
 
-const FEATURES = [
-  { icon: Calendar, title: 'Event Management', description: 'Create and manage events with agendas, venues, and multi-organizer teams.', color: 'bg-blue-500/10 text-blue-600' },
-  { icon: Users, title: 'Attendee Registration', description: 'Custom registration forms with automatic QR codes and email confirmations.', color: 'bg-emerald-500/10 text-emerald-600' },
-  { icon: QrCode, title: 'QR Check-In', description: 'Instant check-in via mobile QR scan — no queues, no manual lists.', color: 'bg-violet-500/10 text-violet-600' },
-  { icon: Award, title: 'Certificates & Badges', description: 'Auto-generate branded certificates with custom templates and verification URLs.', color: 'bg-rose-500/10 text-rose-600' },
-  { icon: BarChart3, title: 'Real-time Analytics', description: 'Live dashboards for registrations, check-ins, and engagement metrics.', color: 'bg-amber-500/10 text-amber-600' },
-  { icon: Trophy, title: 'Gamification', description: 'Points, leaderboards, and badges that keep attendees engaged throughout.', color: 'bg-teal-500/10 text-teal-600' },
-  { icon: Target, title: 'Networking & Meetings', description: '1:1 meeting slots, discussion topics, and follow-up tracking built in.', color: 'bg-pink-500/10 text-pink-600' },
-  { icon: Share2, title: 'Content Sharing', description: 'Share session recordings, slides, and resources with attendees post-event.', color: 'bg-indigo-500/10 text-indigo-600' },
-  { icon: Smartphone, title: 'Mobile PWA', description: 'Install as a phone app — works offline, loads fast, feels native.', color: 'bg-orange-500/10 text-orange-600' },
-  { icon: Download, title: 'Excel Export', description: 'One-click export of attendee lists, check-ins, and analytics data.', color: 'bg-cyan-500/10 text-cyan-600' },
+const FEATURE_GROUPS = [
+  {
+    stage: 'Before the event',
+    color: 'bg-blue-600',
+    lightColor: 'bg-blue-50 text-blue-700 border-blue-100',
+    features: [
+      { icon: Calendar, title: 'Event Setup', description: 'Create events with agendas, speakers, sessions, and venue details in minutes.' },
+      { icon: Users, title: 'Custom Registration', description: 'Build registration forms with any fields you need — t-shirt sizes, dietary needs, role, company.' },
+      { icon: Mail, title: 'Automated Invites', description: 'Attendees receive a confirmation email with their unique QR code immediately after registering.' },
+    ],
+  },
+  {
+    stage: 'Day of the event',
+    color: 'bg-violet-600',
+    lightColor: 'bg-violet-50 text-violet-700 border-violet-100',
+    features: [
+      { icon: QrCode, title: 'QR Check-In', description: 'Scan QR codes at the gate from any phone. No app install needed. Track attendance live.' },
+      { icon: Trophy, title: 'Gamification', description: 'Award points for check-ins, sessions, and activities. Run live leaderboards and badge competitions.' },
+      { icon: Target, title: 'Networking Spots', description: '1:1 meeting slots and discussion topics. Attendees book, meet, and follow up — all in-platform.' },
+    ],
+  },
+  {
+    stage: 'After the event',
+    color: 'bg-teal-600',
+    lightColor: 'bg-teal-50 text-teal-700 border-teal-100',
+    features: [
+      { icon: Award, title: 'Certificates', description: 'Bulk issue branded certificates to all checked-in attendees. Each cert has a public verify URL.' },
+      { icon: BarChart3, title: 'Analytics', description: 'Full event report — registrations, attendance rate, session popularity, engagement score.' },
+      { icon: Share2, title: 'Content & Export', description: 'Share recordings and slides post-event. Export all data to Excel with one click.' },
+    ],
+  },
 ];
 
 const HOW_IT_WORKS = [
@@ -56,10 +77,16 @@ const HOW_IT_WORKS = [
   { step: 4, icon: Award, title: 'Wrap Up & Reward', description: 'Issue certificates, export data, review analytics, and distribute content to attendees.' },
 ];
 
-const GAMIFICATION = [
-  { icon: Trophy, title: 'Leaderboards & Points', description: 'Award points for check-ins, session attendance, and activities. Top attendees compete in real time.' },
-  { icon: Award, title: 'Digital Badges', description: 'Create custom badges tied to milestones. Attendees earn them — and share them.' },
-  { icon: Gift, title: 'Rewards Redemption', description: 'Set up a reward catalog. Attendees redeem points for prizes, swag, or experiences.' },
+const GAMIFICATION_STATS = [
+  { value: '2×', label: 'higher session attendance at gamified events' },
+  { value: '+45 min', label: 'longer attendee dwell time with active leaderboards' },
+  { value: '3.2×', label: 'more sponsor brand interactions vs. non-gamified events' },
+];
+
+const GAMIFICATION_FEATURES = [
+  { icon: Trophy, title: 'Points & Leaderboards', description: 'Award points for check-ins, session attendance, and activities. Top attendees compete in real time on a live leaderboard.' },
+  { icon: Award, title: 'Digital Badges', description: 'Create custom badges tied to milestones — Early Bird, Session Pro, Top Networker. Attendees earn and share them.' },
+  { icon: Gift, title: 'Rewards Redemption', description: 'Set up a reward catalog. Attendees redeem points for coffee vouchers, swag, or event upgrades.' },
 ];
 
 const TESTIMONIALS = [
@@ -89,22 +116,33 @@ const TESTIMONIALS = [
   },
 ];
 
+const TRUST_CARDS = [
+  {
+    icon: Lock,
+    title: 'Is attendee data secure?',
+    body: 'Yes. All data is stored with row-level security, encrypted at rest and in transit using AES-256. We never sell or share attendee data with third parties. Each organisation\'s data is fully isolated.',
+    tag: 'Security',
+    tagColor: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    iconColor: 'text-emerald-600 bg-emerald-50',
+  },
+  {
+    icon: FileSpreadsheet,
+    title: 'Can I export my data?',
+    body: 'Yes, always. Export all attendee data, registrations, check-ins, analytics, and certificates in Excel format at any time — including after cancellation. You own your data, full stop.',
+    tag: 'Data portability',
+    tagColor: 'bg-blue-50 text-blue-700 border-blue-100',
+    iconColor: 'text-blue-600 bg-blue-50',
+  },
+];
+
 const FAQS = [
   {
     q: 'What counts as a "user" for billing?',
-    a: 'A user is any team member who manages or operates events on the platform — organizers, staff, and admins. Attendees who register for your events are free and unlimited.',
+    a: 'A user is any team member who manages or operates events — organizers, staff, and admins. Attendees who register for your events are free and unlimited.',
   },
   {
     q: 'What happens after the free trial ends?',
     a: "After 2 events or 30 days (whichever comes first), you move to the paid plan at ₹199/user/month. We'll remind you 7 days before. No automatic charge without confirmation.",
-  },
-  {
-    q: 'Can I export my data if I cancel?',
-    a: 'Yes. You can export all attendee data, registrations, analytics, and certificates in Excel format at any time — including after cancellation.',
-  },
-  {
-    q: 'Is attendee data secure?',
-    a: 'Yes. Data is stored with row-level security, encrypted at rest and in transit. We do not sell or share attendee data with third parties.',
   },
   {
     q: 'Does it work for small events (under 100 people)?',
@@ -112,7 +150,7 @@ const FAQS = [
   },
   {
     q: 'Can multiple organizers manage the same event?',
-    a: 'Yes. You can add team members with different roles — event manager, staff, sales rep — each with appropriate access levels.',
+    a: 'Yes. Add team members with different roles — event manager, staff, sales rep — each with appropriate access levels.',
   },
 ];
 
@@ -227,6 +265,9 @@ export default function Index() {
             <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
             <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+            <Link to="/demo" className="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors font-medium">
+              <Play className="h-3.5 w-3.5 fill-current" /> Demo
+            </Link>
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
@@ -261,6 +302,9 @@ export default function Index() {
                     {label}
                   </a>
                 ))}
+                <Link to="/demo" className="text-blue-400 text-sm flex items-center gap-1.5" onClick={() => setMobileOpen(false)}>
+                  <Play className="h-3.5 w-3.5 fill-current" /> Watch Demo
+                </Link>
                 <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
                   <Link to="/login" className="text-center text-sm text-white/70 py-2">Login</Link>
                   <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white border-0">
@@ -279,7 +323,6 @@ export default function Index() {
         <div className="absolute -bottom-40 -left-32 w-[480px] h-[480px] bg-teal-500/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none" />
 
-        {/* Floating particles */}
         <div className="absolute top-24 left-[15%] w-2 h-2 rounded-full bg-blue-400/40" style={{ animation: 'float1 4s ease-in-out infinite' }} />
         <div className="absolute top-40 right-[20%] w-3 h-3 rounded-full bg-teal-400/30" style={{ animation: 'float2 5s ease-in-out infinite 0.5s' }} />
         <div className="absolute bottom-32 left-[30%] w-1.5 h-1.5 rounded-full bg-blue-300/35" style={{ animation: 'float3 6s ease-in-out infinite 1s' }} />
@@ -287,20 +330,22 @@ export default function Index() {
         <div className="absolute bottom-1/4 right-[35%] w-1 h-1 rounded-full bg-teal-300/40" style={{ animation: 'float2 4.5s ease-in-out infinite 0.8s' }} />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center w-full">
-          <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
-            <span className="inline-flex items-center gap-2 bg-white/10 text-white/80 border border-white/20 px-4 py-1.5 rounded-full text-sm mb-8">
-              <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-              The complete event platform for modern teams
-            </span>
-          </motion.div>
+
+          {/* Pain statement — leads the narrative */}
+          <motion.p
+            custom={0} variants={fadeUp} initial="hidden" animate="visible"
+            className="text-white/50 text-sm sm:text-base mb-5 font-medium"
+          >
+            Spreadsheets. WhatsApp groups. Manual check-in queues. There's a better way.
+          </motion.p>
 
           <motion.h1
             custom={1} variants={fadeUp} initial="hidden" animate="visible"
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight text-balance leading-[1.1]"
           >
-            Run Smarter Events.{' '}
+            From sign-up to certificate —{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-300 to-teal-400">
-              Delight Every Attendee.
+              one platform, gamification built in.
             </span>
           </motion.h1>
 
@@ -308,9 +353,7 @@ export default function Index() {
             custom={2} variants={fadeUp} initial="hidden" animate="visible"
             className="mt-6 text-lg sm:text-xl text-white/65 max-w-2xl mx-auto text-balance leading-relaxed"
           >
-            Spreadsheets, WhatsApp groups, and manual check-ins don't scale.
-            Event-Sync gives you one platform for registration, check-in, gamification,
-            certificates, and analytics — from first invite to final report.
+            Event-Sync handles registration, QR check-in, live leaderboards, certificates, and analytics — all without stitching together a dozen tools.
           </motion.p>
 
           <motion.div
@@ -319,34 +362,33 @@ export default function Index() {
           >
             <Button size="lg" asChild className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-xl shadow-blue-500/30 text-base px-8">
               <Link to="/register">
-                Start Free Trial
+                Start Free — 2 Events
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <a
-              href="#how-it-works"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20 text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
+            <Link
+              to="/demo"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
             >
-              See How It Works
-              <ChevronDown className="h-4 w-4" />
-            </a>
+              <Play className="h-4 w-4 fill-white/80" />
+              Watch 3-min Product Demo
+            </Link>
           </motion.div>
 
           <motion.div
             custom={4} variants={fadeUp} initial="hidden" animate="visible"
-            className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-white/50 text-sm"
+            className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-white/50 text-sm"
           >
             <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-emerald-400" /> No credit card required</span>
-            <span className="flex items-center gap-1.5"><Timer className="h-4 w-4 text-blue-400" /> 2 events free trial</span>
+            <span className="flex items-center gap-1.5"><Timer className="h-4 w-4 text-blue-400" /> 2 events free</span>
             <span className="flex items-center gap-1.5"><Star className="h-4 w-4 text-amber-400 fill-amber-400" /> 4.9/5 organizer rating</span>
           </motion.div>
 
-          {/* Product Demo Walkthrough */}
+          {/* Product mockup — browser chrome */}
           <motion.div
             custom={5} variants={fadeUp} initial="hidden" animate="visible"
             className="mt-16 relative max-w-5xl mx-auto"
           >
-            {/* Browser chrome */}
             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-2xl shadow-black/50">
               <div className="flex items-center gap-2 mb-3 px-1">
                 <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
@@ -364,9 +406,8 @@ export default function Index() {
                 />
               </div>
             </div>
-            {/* Caption */}
             <p className="mt-4 text-center text-white/40 text-xs">
-              Interactive product walkthrough · <a href="/demo" target="_blank" className="text-white/60 hover:text-white underline transition-colors">Open full screen</a>
+              Interactive walkthrough · <Link to="/demo" className="text-white/60 hover:text-white underline transition-colors">Open full screen</Link>
             </p>
           </motion.div>
         </div>
@@ -410,39 +451,56 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ── 5. FEATURES GRID ── */}
+      {/* ── 5. FEATURES — GROUPED BY STAGE ── */}
       <section id="features" className="py-24 bg-white scroll-mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <motion.span variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 border border-blue-100 px-3 py-1 rounded-full text-sm font-medium mb-4"
             >
-              <Zap className="h-3.5 w-3.5" /> Everything in one platform
+              <Zap className="h-3.5 w-3.5" /> Full event lifecycle, one platform
             </motion.span>
             <motion.h2 custom={1} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="text-3xl sm:text-4xl font-bold text-slate-900 text-balance"
             >
-              Every tool your event team needs
+              Every tool your team needs — organised by stage
             </motion.h2>
             <motion.p custom={2} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="mt-4 text-lg text-slate-500 max-w-xl mx-auto"
             >
-              Stop stitching together a dozen apps. Event-Sync handles the full lifecycle.
+              Stop stitching together a dozen apps. Event-Sync handles every phase from registration to report.
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-            {FEATURES.map((f, i) => (
+          <div className="space-y-10">
+            {FEATURE_GROUPS.map((group, gi) => (
               <motion.div
-                key={f.title} custom={i} variants={fadeUp} initial="hidden"
+                key={group.stage}
+                custom={gi} variants={fadeUp} initial="hidden"
                 whileInView="visible" viewport={{ once: true, margin: '-40px' }}
-                className="group rounded-2xl border border-slate-100 bg-white p-6 hover:shadow-lg hover:border-slate-200 hover:-translate-y-1 transition-all duration-300"
               >
-                <div className={`h-11 w-11 rounded-xl ${f.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <f.icon className="h-5 w-5" />
+                <div className="flex items-center gap-3 mb-5">
+                  <div className={`h-2.5 w-2.5 rounded-full ${group.color}`} />
+                  <span className={`text-xs font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full border ${group.lightColor}`}>
+                    {group.stage}
+                  </span>
                 </div>
-                <h3 className="font-semibold text-slate-800 mb-1.5 text-sm">{f.title}</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">{f.description}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                  {group.features.map((f, fi) => (
+                    <motion.div
+                      key={f.title}
+                      custom={fi} variants={fadeUp} initial="hidden"
+                      whileInView="visible" viewport={{ once: true, margin: '-20px' }}
+                      className="group rounded-2xl border border-slate-100 bg-white p-6 hover:shadow-lg hover:border-slate-200 hover:-translate-y-1 transition-all duration-300"
+                    >
+                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 ${group.lightColor}`}>
+                        <f.icon className="h-5 w-5" />
+                      </div>
+                      <h3 className="font-semibold text-slate-800 mb-1.5 text-sm">{f.title}</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">{f.description}</p>
+                    </motion.div>
+                  ))}
+                </div>
               </motion.div>
             ))}
           </div>
@@ -485,92 +543,139 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ── 7. GAMIFICATION SHOWCASE ── */}
+      {/* ── 7. GAMIFICATION — DEDICATED SECTION ── */}
       <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-16 items-center">
-          <div>
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section header */}
+          <div className="text-center mb-14">
             <motion.span variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="text-blue-400 text-sm font-semibold uppercase tracking-widest"
             >
               Built-in Engagement
             </motion.span>
             <motion.h2 custom={1} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-              className="mt-3 text-3xl sm:text-4xl font-bold text-white text-balance"
+              className="mt-3 text-3xl sm:text-4xl font-bold text-white text-balance max-w-3xl mx-auto"
             >
-              The only event platform with built-in gamification
+              Most events lose attendees to their phones by hour two.
+              <span className="text-blue-300"> Event-Sync keeps them competing.</span>
             </motion.h2>
             <motion.p custom={2} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-              className="mt-5 text-lg text-white/65 leading-relaxed"
+              className="mt-5 text-lg text-white/60 max-w-2xl mx-auto leading-relaxed"
             >
-              Most events lose attendees to their phones by hour 2. Event-Sync keeps them
-              engaged with real-time leaderboards, badges, and rewards — no third-party tools needed.
+              Real-time leaderboards, badge milestones, and rewards catalogs — no third-party tools, no extra setup. The same platform that checks people in also keeps them engaged all day.
             </motion.p>
-            <div className="mt-8 space-y-5">
-              {GAMIFICATION.map((g, i) => (
-                <motion.div
-                  key={g.title} custom={i + 3} variants={fadeUp} initial="hidden"
-                  whileInView="visible" viewport={{ once: true }}
-                  className="flex gap-4"
-                >
-                  <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <g.icon className="h-5 w-5 text-blue-300" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-white text-sm">{g.title}</div>
-                    <div className="text-white/55 text-sm mt-0.5 leading-relaxed">{g.description}</div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
           </div>
 
-          <motion.div custom={0} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="relative">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm shadow-2xl">
-              <div className="flex items-center justify-between mb-5">
-                <div className="text-white font-semibold">Live Leaderboard</div>
-                <span className="text-xs text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/20">● Live</span>
-              </div>
-              <div className="space-y-3">
-                {[
-                  { rank: '🥇', name: 'Priya Nair', pts: 520, bar: 'w-full' },
-                  { rank: '🥈', name: 'Rahul Mehta', pts: 480, bar: 'w-11/12' },
-                  { rank: '🥉', name: 'Sneha K.', pts: 395, bar: 'w-9/12' },
-                  { rank: '4', name: 'Amit Joshi', pts: 310, bar: 'w-7/12' },
-                  { rank: '5', name: 'Kavya R.', pts: 260, bar: 'w-5/12' },
-                ].map((r, i) => (
-                  <motion.div key={r.name} custom={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="flex items-center gap-3">
-                    <span className="text-base w-6 text-center flex-shrink-0">{r.rank}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-white text-xs font-medium truncate">{r.name}</span>
-                        <span className="text-blue-400 text-xs font-semibold ml-2 flex-shrink-0">{r.pts} pts</span>
-                      </div>
-                      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className={`h-full ${r.bar} bg-gradient-to-r from-blue-500 to-teal-400 rounded-full`} />
-                      </div>
+          {/* ROI stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-14">
+            {GAMIFICATION_STATS.map((s, i) => (
+              <motion.div
+                key={s.label} custom={i} variants={fadeUp} initial="hidden"
+                whileInView="visible" viewport={{ once: true }}
+                className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 text-center"
+              >
+                <div className="text-3xl font-extrabold text-blue-300 mb-2">{s.value}</div>
+                <div className="text-sm text-white/55 leading-snug">{s.label}</div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Before/after + features + mockup */}
+          <div className="grid md:grid-cols-2 gap-16 items-start">
+            <div>
+              {/* Before/after */}
+              <motion.div custom={0} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+                className="mb-8 grid grid-cols-2 gap-3"
+              >
+                <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
+                  <div className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-2">Without gamification</div>
+                  <ul className="space-y-1.5 text-sm text-white/50">
+                    <li className="flex items-start gap-2"><span className="text-red-400 mt-0.5 flex-shrink-0">✗</span>Attendees on phones by session 2</li>
+                    <li className="flex items-start gap-2"><span className="text-red-400 mt-0.5 flex-shrink-0">✗</span>Sponsors see low brand interaction</li>
+                    <li className="flex items-start gap-2"><span className="text-red-400 mt-0.5 flex-shrink-0">✗</span>Sessions half-empty after lunch</li>
+                  </ul>
+                </div>
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                  <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-2">With Event-Sync</div>
+                  <ul className="space-y-1.5 text-sm text-white/50">
+                    <li className="flex items-start gap-2"><span className="text-emerald-400 mt-0.5 flex-shrink-0">✓</span>Attendees checking leaderboard between sessions</li>
+                    <li className="flex items-start gap-2"><span className="text-emerald-400 mt-0.5 flex-shrink-0">✓</span>Sponsors see 3.2× more interactions</li>
+                    <li className="flex items-start gap-2"><span className="text-emerald-400 mt-0.5 flex-shrink-0">✓</span>Full rooms — all day</li>
+                  </ul>
+                </div>
+              </motion.div>
+
+              {/* Feature list */}
+              <div className="space-y-5">
+                {GAMIFICATION_FEATURES.map((g, i) => (
+                  <motion.div
+                    key={g.title} custom={i + 3} variants={fadeUp} initial="hidden"
+                    whileInView="visible" viewport={{ once: true }}
+                    className="flex gap-4"
+                  >
+                    <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                      <g.icon className="h-5 w-5 text-blue-300" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white text-sm">{g.title}</div>
+                      <div className="text-white/55 text-sm mt-0.5 leading-relaxed">{g.description}</div>
                     </div>
                   </motion.div>
                 ))}
               </div>
-              <div className="mt-5 pt-4 border-t border-white/10">
-                <div className="text-white/40 text-xs mb-2">Recent badges earned</div>
-                <div className="flex gap-2 flex-wrap">
-                  {['Early Bird 🐦', 'Session Pro 🎯', 'Networker 🤝'].map(b => (
-                    <span key={b} className="text-xs bg-white/10 text-white/70 px-2.5 py-1 rounded-full border border-white/10">{b}</span>
+            </div>
+
+            {/* Live leaderboard mockup */}
+            <motion.div custom={0} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="relative">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm shadow-2xl">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="text-white font-semibold">Live Leaderboard</div>
+                  <span className="text-xs text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { rank: '🥇', name: 'Priya Nair',   pts: 520, bar: 'w-full' },
+                    { rank: '🥈', name: 'Rahul Mehta',  pts: 480, bar: 'w-11/12' },
+                    { rank: '🥉', name: 'Sneha K.',      pts: 395, bar: 'w-9/12' },
+                    { rank: '4',  name: 'Amit Joshi',   pts: 310, bar: 'w-7/12' },
+                    { rank: '5',  name: 'Kavya R.',      pts: 260, bar: 'w-5/12' },
+                  ].map((r, i) => (
+                    <motion.div key={r.name} custom={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="flex items-center gap-3">
+                      <span className="text-base w-6 text-center flex-shrink-0">{r.rank}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-white text-xs font-medium truncate">{r.name}</span>
+                          <span className="text-blue-400 text-xs font-semibold ml-2 flex-shrink-0">{r.pts} pts</span>
+                        </div>
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <div className={`h-full ${r.bar} bg-gradient-to-r from-blue-500 to-teal-400 rounded-full`} />
+                        </div>
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
+                <div className="mt-5 pt-4 border-t border-white/10">
+                  <div className="text-white/40 text-xs mb-2">Recent badges earned</div>
+                  <div className="flex gap-2 flex-wrap">
+                    {['Early Bird 🐦', 'Session Pro 🎯', 'Networker 🤝'].map(b => (
+                      <span key={b} className="text-xs bg-white/10 text-white/70 px-2.5 py-1 rounded-full border border-white/10">{b}</span>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div
-              className="absolute -top-4 -right-4 bg-gradient-to-br from-blue-500 to-teal-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg shadow-blue-500/40"
-              style={{ animation: 'float1 3s ease-in-out infinite' }}
-            >
-              🎉 +50 pts earned!
-            </div>
-          </motion.div>
+              <div
+                className="absolute -top-4 -right-4 bg-gradient-to-br from-blue-500 to-teal-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg shadow-blue-500/40"
+                style={{ animation: 'float1 3s ease-in-out infinite' }}
+              >
+                🎉 +50 pts earned!
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -617,31 +722,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ── 9. FAQ ── */}
-      <section id="faq" className="py-24 bg-slate-50 scroll-mt-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <motion.h2 custom={0} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-              className="text-3xl sm:text-4xl font-bold text-slate-900"
-            >
-              Frequently asked questions
-            </motion.h2>
-            <motion.p custom={1} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-              className="mt-4 text-slate-500"
-            >
-              Everything you need to know before getting started.
-            </motion.p>
-          </div>
-          <div className="space-y-3">
-            {FAQS.map((faq, i) => (
-              <FAQItem key={faq.q} q={faq.q} a={faq.a} index={i} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 10. PRICING ── */}
-      <section id="pricing" className="py-24 bg-white scroll-mt-16">
+      {/* ── 9. PRICING ── */}
+      <section id="pricing" className="py-24 bg-slate-50 scroll-mt-16">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <motion.span variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}
@@ -682,7 +764,7 @@ export default function Index() {
             className="relative rounded-3xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 via-white to-teal-50/40 p-10 shadow-2xl shadow-blue-500/10"
           >
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-teal-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
-              Most Popular
+              All features included
             </div>
 
             <div className="text-center mb-8">
@@ -705,7 +787,7 @@ export default function Index() {
 
             <Button size="lg" asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-lg shadow-blue-500/25 text-base">
               <Link to="/register">
-                Start Free Trial
+                Start Free Trial — No Credit Card
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -717,6 +799,55 @@ export default function Index() {
         </div>
       </section>
 
+      {/* ── 10. TRUST + FAQ ── */}
+      <section id="faq" className="py-24 bg-white scroll-mt-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <motion.h2 custom={0} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="text-3xl sm:text-4xl font-bold text-slate-900"
+            >
+              Questions & answers
+            </motion.h2>
+            <motion.p custom={1} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="mt-4 text-slate-500"
+            >
+              Everything you need to know before getting started.
+            </motion.p>
+          </div>
+
+          {/* High-intent trust cards — surfaced inline */}
+          <div className="grid sm:grid-cols-2 gap-4 mb-10">
+            {TRUST_CARDS.map((card, i) => (
+              <motion.div
+                key={card.title} custom={i} variants={fadeUp} initial="hidden"
+                whileInView="visible" viewport={{ once: true }}
+                className="rounded-2xl border border-slate-100 bg-slate-50 p-6"
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${card.iconColor}`}>
+                    <card.icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className={`inline-flex items-center text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border mb-2 ${card.tagColor}`}>
+                      {card.tag}
+                    </div>
+                    <h3 className="font-semibold text-slate-800 text-sm mb-2">{card.title}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">{card.body}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Remaining FAQ accordion */}
+          <div className="space-y-3">
+            {FAQS.map((faq, i) => (
+              <FAQItem key={faq.q} q={faq.q} a={faq.a} index={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── 11. FINAL CTA ── */}
       <section className="relative py-32 bg-gradient-to-r from-blue-600 via-blue-700 to-teal-600 overflow-hidden">
         <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
@@ -725,7 +856,7 @@ export default function Index() {
           <motion.h2 custom={0} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-balance"
           >
-            Ready to transform your events?
+            Ready to run your best event yet?
           </motion.h2>
           <motion.p custom={1} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="mt-5 text-xl text-white/75"
@@ -738,15 +869,16 @@ export default function Index() {
           >
             <Button size="lg" asChild className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50 border-0 shadow-xl font-semibold text-base px-8">
               <Link to="/register">
-                Start Free Trial
+                Start Free — 2 Events
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Link
-              to="/events"
+              to="/demo"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/30 text-white hover:bg-white/10 rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
             >
-              Browse Events
+              <Play className="h-4 w-4 fill-white/80" />
+              Watch Demo
             </Link>
           </motion.div>
           <motion.p custom={3} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
@@ -770,8 +902,14 @@ export default function Index() {
             <div>
               <h4 className="text-white text-sm font-semibold mb-4">Product</h4>
               <ul className="space-y-3 text-sm">
-                {[['Features', '#features'], ['Pricing', '#pricing'], ['Security', '#'], ['Changelog', '#']].map(([l, h]) => (
-                  <li key={l}><a href={h} className="hover:text-white transition-colors">{l}</a></li>
+                {[['Features', '#features'], ['Pricing', '#pricing'], ['Security', '#faq'], ['Demo', '/demo']].map(([l, h]) => (
+                  <li key={l}>
+                    {h.startsWith('/') ? (
+                      <Link to={h} className="hover:text-white transition-colors">{l}</Link>
+                    ) : (
+                      <a href={h} className="hover:text-white transition-colors">{l}</a>
+                    )}
+                  </li>
                 ))}
               </ul>
             </div>
