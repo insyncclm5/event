@@ -39,6 +39,7 @@ import Analytics from "./pages/admin/Analytics";
 import LandingPageAdmin from "./pages/admin/LandingPage";
 import Registrations from "./pages/admin/Registrations";
 import Settings from "./pages/admin/Settings";
+import Billing from "./pages/admin/Billing";
 import AdminMeetingSpots from "./pages/admin/MeetingSpots";
 // Platform Pages
 import PlatformDashboard from "./pages/platform/Dashboard";
@@ -96,6 +97,7 @@ const App = () => (
             <Route path="/admin/check-in/:eventId" element={<ProtectedRoute allowedRoles={[...adminRoles]}><CheckIn /></ProtectedRoute>} />
             <Route path="/admin/registrations" element={<ProtectedRoute allowedRoles={[...adminRoles]}><Registrations /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={[...adminRoles]}><Settings /></ProtectedRoute>} />
+            <Route path="/admin/billing" element={<ProtectedRoute allowedRoles={[...adminRoles]}><Billing /></ProtectedRoute>} />
             
             {/* Platform Admin Route */}
             <Route path="/platform" element={<PlatformDashboard />} />

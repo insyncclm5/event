@@ -12,6 +12,7 @@ import {
   UserPlus,
   Share2,
   TrendingUp,
+  Wallet,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ const navigation = [
   { name: 'Events', href: '/admin/events', icon: Calendar },
   { name: 'Registrations', href: '/admin/registrations', icon: Users },
   { name: 'Check-In', href: '/admin/check-in', icon: QrCode },
+  { name: 'Billing', href: '/admin/billing', icon: Wallet },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
