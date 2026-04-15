@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 
 // Pages
 import Index from "./pages/Index";
+import Demo from "./pages/Demo";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Events from "./pages/Events";
@@ -63,6 +64,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/demo" element={<Demo />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/my-events" element={<MyEvents />} />
