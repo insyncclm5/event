@@ -178,6 +178,9 @@ const PRICING_FEATURES = [
 
 const TRUSTED_BY = ['TechSummit India', 'StartupWeek', 'EduCon', 'MedConf', 'FinFest', 'HRLeaders'];
 
+const fireLeadEvent = () =>
+  (window as any).gtag?.('event', 'generate_lead', { product_key: 'crm', form_type: 'signup' });
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix: string }) {
@@ -281,7 +284,7 @@ export default function Index() {
             <Link to="/login" className="text-sm text-white/70 hover:text-white transition-colors px-3 py-1.5">
               Login
             </Link>
-            <Button size="sm" asChild className="bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-lg shadow-blue-500/25">
+            <Button size="sm" asChild className="bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-lg shadow-blue-500/25" onClick={fireLeadEvent}>
               <Link to="/register">Start Free Trial</Link>
             </Button>
           </div>
@@ -314,7 +317,7 @@ export default function Index() {
                 </Link>
                 <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
                   <Link to="/login" className="text-center text-sm text-white/70 py-2">Login</Link>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white border-0">
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white border-0" onClick={fireLeadEvent}>
                     <Link to="/register">Start Free Trial</Link>
                   </Button>
                 </div>
@@ -367,7 +370,7 @@ export default function Index() {
             custom={3} variants={fadeUp} initial="hidden" animate="visible"
             className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Button size="lg" asChild className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-xl shadow-blue-500/30 text-base px-8">
+            <Button size="lg" asChild className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-xl shadow-blue-500/30 text-base px-8" onClick={fireLeadEvent}>
               <Link to="/register">
                 Start Free — 2 Events
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -376,6 +379,7 @@ export default function Index() {
             <Link
               to="/demo"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
+              onClick={fireLeadEvent}
             >
               <Play className="h-4 w-4 fill-white/80" />
               Watch 3-min Product Demo
@@ -792,7 +796,7 @@ export default function Index() {
               ))}
             </ul>
 
-            <Button size="lg" asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-lg shadow-blue-500/25 text-base">
+            <Button size="lg" asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-lg shadow-blue-500/25 text-base" onClick={fireLeadEvent}>
               <Link to="/register">
                 Start Free Trial — No Credit Card
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -874,7 +878,7 @@ export default function Index() {
             custom={2} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Button size="lg" asChild className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50 border-0 shadow-xl font-semibold text-base px-8">
+            <Button size="lg" asChild className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50 border-0 shadow-xl font-semibold text-base px-8" onClick={fireLeadEvent}>
               <Link to="/register">
                 Start Free — 2 Events
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -883,6 +887,7 @@ export default function Index() {
             <Link
               to="/demo"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/30 text-white hover:bg-white/10 rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
+              onClick={fireLeadEvent}
             >
               <Play className="h-4 w-4 fill-white/80" />
               Watch Demo
